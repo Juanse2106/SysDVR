@@ -189,3 +189,4 @@ void SysClearAutoStartUsb()
     if (mid)
         (*env)->CallStaticVoidMethod(env, activityClass, mid);
 }
+
