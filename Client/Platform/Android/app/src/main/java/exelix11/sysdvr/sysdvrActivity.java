@@ -1,23 +1,74 @@
-package exelix11.sysdvr;
+public class sysdvrActivity extends SDLActivity
+{
+    public static sysdvrActivity instance;
+
+    // Flag so the C# layer knows it should skip the home screen and auto-connect USB
+    public static boolean autoStartUsb = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log("SysDVRActivity onCreate()");
+        super.onCreate(savedInstanceState);package exelix11.sysdvr;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.util.Log;
 
 import org.libsdl.app.SDLActivity;
 
-public class sysdvrActivity extends SDLActivity
-{
-    public static sysdvrActivity instance;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log("SysDVRActivity onCreate()");
-		super.onCreate(savedInstanceState);
         instance = this;
         CheckPackageName();
-		Log("SysDVRActivity created");
+
+        // Check if we were launched by a USB_DEVICE_ATTACHED event
+        handleLaunchIntent(getIntent());
+
+        Log("SysDVRActivity created, autoStartUsb=" + autoStartUsb);
+    }
+
+    // Called when the app is already running and a new USB device is plugged in
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log("SysDVRActivity onNewIntent()");
+        handleLaunchIntent(intent);
+    }
+
+    // Detect if this launch was triggered by the Switch being plugged in via USB
+    private void handleLaunchIntent(Intent intent) {
+        if (intent == null) return;
+
+        String action = intent.getAction();
+        Log("SysDVRActivity handleLaunchIntent action=" + action);
+
+        if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+            UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+            if (device != null) {
+                int vid = device.getVendorId();
+                int pid = device.getProductId();
+                Log("USB device attached: VID=" + vid + " PID=" + pid);
+
+                // VID 0x18D1 = Google (ADB), PID 0x4EE0 = SysDVR USB mode
+                if (vid == 0x18D1 && pid == 0x4EE0) {
+                    Log("Switch with SysDVR detected - enabling auto USB connect");
+                    autoStartUsb = true;
+                }
+            }
+        }
+    }
+
+    // Called from native C# layer via JNI to check if we should auto-start USB
+    public static boolean ShouldAutoStartUsb() {
+        return autoStartUsb;
+    }
+
+    // Called from native C# layer after auto-connect is initiated, to reset the flag
+    public static void ClearAutoStartUsb() {
+        autoStartUsb = false;
     }
 
     static boolean checkOnce = true;
@@ -60,3 +111,4 @@ public class sysdvrActivity extends SDLActivity
         Log.i("SysDVRJava", message);
     }
 }
+
