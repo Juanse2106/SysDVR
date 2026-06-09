@@ -278,9 +278,9 @@ public class ClientApp : IApplicationInstance
         // skip the home screen and go straight to USB streaming automatically.
 #if ANDROID_LIB
         if (CommandLine.StreamingMode == CommandLineOptions.StreamMode.None && 
-            exelix11.sysdvr.sysdvrActivity.autoStartUsb)
+            Program.AutoStartUsb)
         {
-            exelix11.sysdvr.sysdvrActivity.autoStartUsb = false;
+            Program.AutoStartUsb = false;
             HandlePushView(new UsbDevicesView(this, Program.Options.Streaming, ""));
             return;
         }
