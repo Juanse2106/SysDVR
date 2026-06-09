@@ -27,6 +27,8 @@ namespace SysDVR.Client
 		public readonly static bool IsLinux = false;
         public readonly static bool IsContainerApp = false;
 		public readonly static bool IsAndroid = true;
+        // Plug & Play: set to true by the JNI layer when app is launched via USB_DEVICE_ATTACHED
+        public static bool AutoStartUsb = false;
 #else
         public readonly static bool IsWindows = OperatingSystem.IsWindows();
         public readonly static bool IsMacOs = OperatingSystem.IsMacOS();
@@ -80,6 +82,13 @@ namespace SysDVR.Client
                 return result;
 
             NativeLogger.Setup();
+
+            // Plug & Play: check if app was launched by plugging in the Switch
+            if (Native.SysShouldAutoStartUsb != null && Native.SysShouldAutoStartUsb())
+            {
+                AutoStartUsb = true;
+                Native.SysClearAutoStartUsb?.Invoke();
+            }
 
             RunApp(new string[0]);
 
