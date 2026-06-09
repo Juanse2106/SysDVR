@@ -56,7 +56,7 @@ jobs:
       run: |
         cd ./Client/Platform/Android
         chmod +x gradlew
-        ./gradlew assembleRelease
+        ./gradlew assembleDebug
       env: 
         ANDROID_CI_KEY: ${{ secrets.ANDROID_CI_KEY }}
     - uses: actions/upload-artifact@v4
