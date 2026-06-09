@@ -157,3 +157,35 @@ void SysInit()
     sys = (*env)->FindClass(env, "exelix11/sysdvr/SystemHelper");
     sys = (*env)->NewGlobalRef(env, sys);
 }
+// ---- Plug & Play auto-connect support ----
+// Cached reference to sysdvrActivity class for auto-start checks
+static jclass activityClass = NULL;
+
+// Called once at startup to cache the activity class reference
+void SysInitAutoConnect()
+{
+    JNIEnv* env = GetJNIEnv();
+    jclass local = (*env)->FindClass(env, "exelix11/sysdvr/sysdvrActivity");
+    if (local)
+        activityClass = (*env)->NewGlobalRef(env, local);
+}
+
+// Returns true if the app was launched by a Switch USB plug-in event
+bool SysShouldAutoStartUsb()
+{
+    if (!activityClass) return false;
+    DECLARE_JNI;
+    jmethodID mid = (*env)->GetStaticMethodID(env, activityClass, "ShouldAutoStartUsb", "()Z");
+    if (!mid) return false;
+    return (bool)(*env)->CallStaticBooleanMethod(env, activityClass, mid);
+}
+
+// Call this after auto-connect is triggered to reset the flag
+void SysClearAutoStartUsb()
+{
+    if (!activityClass) return;
+    DECLARE_JNI;
+    jmethodID mid = (*env)->GetStaticMethodID(env, activityClass, "ClearAutoStartUsb", "()V");
+    if (mid)
+        (*env)->CallStaticVoidMethod(env, activityClass, mid);
+}
