@@ -274,6 +274,17 @@ public class ClientApp : IApplicationInstance
 
     internal void PushMainview() 
     {
+        // Plug & Play: if launched by a USB_DEVICE_ATTACHED intent (Switch plugged in),
+        // skip the home screen and go straight to USB streaming automatically.
+#if ANDROID_LIB
+        if (CommandLine.StreamingMode == CommandLineOptions.StreamMode.None && 
+            exelix11.sysdvr.sysdvrActivity.autoStartUsb)
+        {
+            exelix11.sysdvr.sysdvrActivity.autoStartUsb = false;
+            HandlePushView(new UsbDevicesView(this, Program.Options.Streaming, ""));
+            return;
+        }
+#endif
         // If no streaming has been requested boot into the main menu
         if (CommandLine.StreamingMode == CommandLineOptions.StreamMode.None)
             HandlePushView(new MainView(this));
