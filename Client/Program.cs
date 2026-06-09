@@ -1,4 +1,4 @@
-﻿using SDL2;
+using SDL2;
 using SysDVR.Client.App;
 using SysDVR.Client.Core;
 using SysDVR.Client.GUI.Components;
