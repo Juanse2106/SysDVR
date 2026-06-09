@@ -1,14 +1,4 @@
-public class sysdvrActivity extends SDLActivity
-{
-    public static sysdvrActivity instance;
-
-    // Flag so the C# layer knows it should skip the home screen and auto-connect USB
-    public static boolean autoStartUsb = false;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log("SysDVRActivity onCreate()");
-        super.onCreate(savedInstanceState);package exelix11.sysdvr;
+package exelix11.sysdvr;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -20,7 +10,17 @@ import android.util.Log;
 
 import org.libsdl.app.SDLActivity;
 
+public class sysdvrActivity extends SDLActivity
+{
+    public static sysdvrActivity instance;
 
+    // Flag so the C# layer knows it should skip the home screen and auto-connect USB
+    public static boolean autoStartUsb = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        Log("SysDVRActivity onCreate()");
+        super.onCreate(savedInstanceState);
         instance = this;
         CheckPackageName();
 
@@ -111,4 +111,3 @@ import org.libsdl.app.SDLActivity;
         Log.i("SysDVRJava", message);
     }
 }
-
