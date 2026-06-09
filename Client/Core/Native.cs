@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace SysDVR.Client.Core
@@ -58,6 +58,10 @@ namespace SysDVR.Client.Core
         public delegate int ReadAssetFile([MarshalAs(UnmanagedType.LPWStr)] string path, out IntPtr buffer, out int size);
 
         public delegate void FreeDynamicBuffer(IntPtr buffer);
+
+        // Plug & Play: check if app was launched by USB device attach event
+        public delegate bool SysShouldAutoStartUsb();
+        public delegate void SysClearAutoStartUsb();
     }
 
     public enum NativeError : int 
@@ -101,6 +105,10 @@ namespace SysDVR.Client.Core
         // Asset management, must be populated
         public NativeContracts.ReadAssetFile ReadAssetFile;
         public NativeContracts.FreeDynamicBuffer FreeDynamicBuffer;
+
+        // Plug & Play
+        public NativeContracts.SysShouldAutoStartUsb? SysShouldAutoStartUsb;
+        public NativeContracts.SysClearAutoStartUsb? SysClearAutoStartUsb;
 
 		public bool PlatformSupportsUsb => 
             UsbAcquireSnapshot != null && UsbReleaseSnapshot != null &&
@@ -165,6 +173,8 @@ namespace SysDVR.Client.Core
             public IntPtr SysIterateAssetsContent;
             public IntPtr SysReadAssetFile;
             public IntPtr SysFreeDynamicBuffer;
+            public IntPtr SysShouldAutoStartUsb;
+            public IntPtr SysClearAutoStartUsb;
         }
 
         public unsafe static NativeError Read(IntPtr ptr, out NativeInitBlock native)
@@ -213,6 +223,8 @@ namespace SysDVR.Client.Core
                 
                 ReadAssetFile = repr.SysReadAssetFile == IntPtr.Zero ? null : Marshal.GetDelegateForFunctionPointer<NativeContracts.ReadAssetFile>(repr.SysReadAssetFile),
                 FreeDynamicBuffer = repr.SysFreeDynamicBuffer == IntPtr.Zero ? null : Marshal.GetDelegateForFunctionPointer<NativeContracts.FreeDynamicBuffer>(repr.SysFreeDynamicBuffer),
+                SysShouldAutoStartUsb = repr.SysShouldAutoStartUsb == IntPtr.Zero ? null : Marshal.GetDelegateForFunctionPointer<NativeContracts.SysShouldAutoStartUsb>(repr.SysShouldAutoStartUsb),
+                SysClearAutoStartUsb = repr.SysClearAutoStartUsb == IntPtr.Zero ? null : Marshal.GetDelegateForFunctionPointer<NativeContracts.SysClearAutoStartUsb>(repr.SysClearAutoStartUsb),
 			};
 
             return NativeError.Success;
