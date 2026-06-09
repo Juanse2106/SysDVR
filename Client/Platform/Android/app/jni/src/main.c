@@ -32,6 +32,8 @@ struct NativeInitBlock
     void* SysIterateAssetsContent;
     void* SysReadAssetFile;
     void* SysFreeDynamicBuffer;
+    void* SysShouldAutoStartUsb;
+    void* SysClearAutoStartUsb;
 };
 
 // Forward declare needed functions
@@ -52,6 +54,9 @@ void UsbCloseHandle(void* handle);
 
 // from native.c
 void SysInit();
+bool SysShouldAutoStartUsb();
+void SysClearAutoStartUsb();
+void SysInitAutoConnect();
 bool SysOpenUrl(const jchar* string);
 void SysGetClipboard(char* buffer, int size);
 bool SysGetFileAccessInfo(bool* hasPermission, bool* canRequest);
@@ -91,7 +96,9 @@ struct NativeInitBlock g_native =
     .SysGetSettingsStoragePath = SysGetSettingsStoragePath,
     .SysIterateAssetsContent = SysIterateAssetsContent,
     .SysReadAssetFile = SysReadAssetFile,
-    .SysFreeDynamicBuffer = SysFreeDynamicBuffer
+    .SysFreeDynamicBuffer = SysFreeDynamicBuffer,
+    .SysShouldAutoStartUsb = SysShouldAutoStartUsb,
+    .SysClearAutoStartUsb = SysClearAutoStartUsb
 };
 
 extern int sysdvr_entrypoint(struct NativeInitBlock* init);
@@ -105,6 +112,7 @@ int main(int argc, char *argv[])
     // Initialize JNI components
     InitThreading();
     SysInit();
+    SysInitAutoConnect();
     UsbInit();
 
 	L("Calling entrypoint");
