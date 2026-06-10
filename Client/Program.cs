@@ -90,7 +90,8 @@ namespace SysDVR.Client
                 Native.SysClearAutoStartUsb?.Invoke();
             }
 
-            RunApp(new string[0]);
+            // On Android always start in USB mode - no mode selection needed
+            RunApp(new string[] { "usb" });
 
             return NativeError.Success;
         }
