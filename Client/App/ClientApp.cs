@@ -1,4 +1,4 @@
-﻿namespace SysDVR.Client.App;
+namespace SysDVR.Client.App;
 
 using ImGuiNET;
 using SDL2;
@@ -274,13 +274,13 @@ public class ClientApp : IApplicationInstance
 
     internal void PushMainview() 
     {
-        // Plug & Play: if launched by a USB_DEVICE_ATTACHED intent (Switch plugged in),
-        // skip the home screen and go straight to USB streaming automatically.
+        // Plug & Play: on Android always skip home screen and go straight to USB
 #if ANDROID_LIB
-        if (CommandLine.StreamingMode == CommandLineOptions.StreamMode.None && 
-            Program.AutoStartUsb)
+        if (CommandLine.StreamingMode == CommandLineOptions.StreamMode.None ||
+            CommandLine.StreamingMode == CommandLineOptions.StreamMode.Usb)
         {
             Program.AutoStartUsb = false;
+            // Pass "" as autoConnect = connect to first Switch found automatically
             HandlePushView(new UsbDevicesView(this, Program.Options.Streaming, ""));
             return;
         }
