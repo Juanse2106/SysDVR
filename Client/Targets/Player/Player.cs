@@ -1,4 +1,4 @@
-﻿using FFmpeg.AutoGen;
+using FFmpeg.AutoGen;
 using SysDVR.Client.Core;
 using SysDVR.Client.Sources;
 using System;
@@ -202,6 +202,10 @@ namespace SysDVR.Client.Targets.Player
             TargetTextureSize = new SDL_Rect() { x = 0, y = 0, w = StreamInfo.VideoWidth, h = StreamInfo.VideoHeight };
             TargetTexture = tex;
             TextureLock = new object();
+
+            // SwitchCast quality: set texture scale mode to best available
+            // SDL_ScaleModeLinear = 1, SDL_ScaleModeBest = 2
+            SDL_SetTextureScaleMode(tex, SDL_ScaleMode.SDL_ScaleModeBest);
         }
 
         unsafe void InitVideoDecoder(string? name)
