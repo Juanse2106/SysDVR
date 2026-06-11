@@ -295,10 +295,10 @@ namespace SysDVR.Client.GUI
 
         public PlayerView(ClientApp owner, PlayerManager manager) : base(owner)
         {
-            // Adaptive rendering causes a lot of stuttering, for now avoid it in the video player
+            // SwitchCast: always uncapped by default, Switch outputs at 30fps
             RenderMode =
                 Program.Options.UncapStreaming ? FramerateCapOptions.Uncapped() :
-                FramerateCapOptions.Target(36);
+                FramerateCapOptions.Target(30);
 
             Popups.Add(quitConfirm);
             Popups.Add(fatalError);
@@ -696,3 +696,4 @@ namespace SysDVR.Client.GUI
         }
     }
 }
+
