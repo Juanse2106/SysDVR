@@ -73,7 +73,8 @@ Result CoreInit()
 #ifndef USB_ONLY
 atomic_bool IsThreadRunning = false;
 
-static u8 alignas(0x1000) VStreamStackArea[0x2000 + LOGGING_STACK_BOOST];
+// SwitchCast: increased video thread stack from 0x2000 to 0x4000
+static u8 alignas(0x1000) VStreamStackArea[0x4000 + LOGGING_STACK_BOOST];
 #endif
 static u8 alignas(0x1000) AStreamStackArea[0x2000 + LOGGING_STACK_BOOST];
 
@@ -161,13 +162,14 @@ static void EnterTargetMode()
 		LOG("Starting video thread\n");
 		if (CurrentMode->VThread) {
 			memset(VStreamStackArea, 0, sizeof(VStreamStackArea));
-			LaunchThread(&VideoThread, CurrentMode->VThread, CurrentMode->Vargs, VStreamStackArea, sizeof(VStreamStackArea), 0x2C);
+			// SwitchCast: raised thread priority from 0x2C to 0x2A for lower latency
+			LaunchThread(&VideoThread, CurrentMode->VThread, CurrentMode->Vargs, VStreamStackArea, sizeof(VStreamStackArea), 0x2A);
 		}
 
 		LOG("Starting audio thread\n");
 		if (CurrentMode->AThread) {
 			memset(AStreamStackArea, 0, sizeof(AStreamStackArea));
-			LaunchThread(&AudioThread, CurrentMode->AThread, CurrentMode->Aargs, AStreamStackArea, sizeof(AStreamStackArea), 0x2C);
+			LaunchThread(&AudioThread, CurrentMode->AThread, CurrentMode->Aargs, AStreamStackArea, sizeof(AStreamStackArea), 0x2A);
 		}
 	}
 
@@ -287,7 +289,7 @@ void UsbOnlyEntrypoint()
 {
 	USB_MODE.InitFn();
 	memset(AStreamStackArea, 0, sizeof(AStreamStackArea));
-	LaunchThread(&AudioThread, USB_MODE.AThread, USB_MODE.Aargs, AStreamStackArea, sizeof(AStreamStackArea), 0x2C);
+	LaunchThread(&AudioThread, USB_MODE.AThread, USB_MODE.Aargs, AStreamStackArea, sizeof(AStreamStackArea), 0x2A);
 	USB_MODE.VThread(USB_MODE.Vargs);
 	USB_MODE.ExitFn();
 }
