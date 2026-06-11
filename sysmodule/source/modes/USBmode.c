@@ -25,7 +25,8 @@ static bool SendData(void* data, size_t length)
 	bool success;
 	mutexLock(&UsbMutex);
 
-	bool isTooLate = armGetSystemTick() - LastConnection > armNsToTicks(1.5E+9);
+	// SwitchCast: reduced from 1.5s to 0.5s for faster disconnect detection
+	bool isTooLate = armGetSystemTick() - LastConnection > armNsToTicks(5E+8);
 	if (isTooLate || !ClientConnected())
 		success = false;
 	else 
