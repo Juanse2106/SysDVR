@@ -1,4 +1,4 @@
-﻿using LibUsbDotNet.LibUsb;
+using LibUsbDotNet.LibUsb;
 using LibUsbDotNet.Main;
 using SysDVR.Client.Core;
 using System;
@@ -29,7 +29,8 @@ namespace SysDVR.Client.Sources
         {
             var (epIn, epOut) = (ReadEndpointID.Ep01, WriteEndpointID.Ep01);
 
-            var reader = DeviceHandle.OpenEndpointReader(epIn, PacketHeader.MaxTransferSize, EndpointType.Bulk);
+            // SwitchCast: use larger read buffer for better USB throughput
+            var reader = DeviceHandle.OpenEndpointReader(epIn, PacketHeader.MaxTransferSize * 4, EndpointType.Bulk);
             var writer = DeviceHandle.OpenEndpointWriter(epOut, EndpointType.Bulk);
 
             return (reader, writer);
@@ -254,3 +255,4 @@ namespace SysDVR.Client.Sources
     }
 #endif
 }
+
