@@ -29,8 +29,9 @@ namespace SysDVR.Client.Core
 
     public class Options
     {
-        public bool UncapStreaming;
-        public bool UncapGUI;
+        // SwitchCast: uncap both streaming and GUI framerate by default
+        public bool UncapStreaming = true;
+        public bool UncapGUI = true;
         public string RecordingsPath = DefaultPlatformVideoPath();
         public string ScreenshotsPath = DefaultPlatformPicturePath();
         public bool HideSerials;
@@ -168,3 +169,4 @@ namespace SysDVR.Client.Core
     {
     }
 }
+
