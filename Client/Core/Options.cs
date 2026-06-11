@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -51,7 +51,8 @@ namespace SysDVR.Client.Core
 
         // SDL options
         public bool ForceSoftwareRenderer;
-        public SDLScaleMode RendererScale = SDLScaleMode.Linear;
+        // SwitchCast: default to Best quality scaling for better upscaling on TV
+        public SDLScaleMode RendererScale = SDLScaleMode.Best;
         public SDLAudioMode AudioPlayerMode = SDLAudioMode.Auto;
 
         // Sysmodule options
