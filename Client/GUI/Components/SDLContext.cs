@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using SDL2;
 using SysDVR.Client.Core;
 using System;
@@ -79,7 +79,17 @@ namespace SysDVR.Client.GUI.Components
 
             SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 
+            // SwitchCast quality improvements: use best available scaling
             SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, Program.Options.ScaleHintForSDL);
+
+            // Use GPU-accelerated rendering pipeline for better quality
+            SDL_SetHint("SDL_RENDER_BATCHING", "1");
+
+            // Prefer OpenGL ES on Android for better texture filtering
+            SDL_SetHint("SDL_OPENGL_ES_DRIVER", "1");
+
+            // Enable VSync for smoother rendering
+            SDL_SetHint("SDL_RENDER_VSYNC", "1");
 
             SDLThreadId = Thread.CurrentThread.ManagedThreadId;
         }
@@ -117,6 +127,9 @@ namespace SysDVR.Client.GUI.Components
                 return false;
 
             WindowSize = new(w, h);
+
+            // SwitchCast: set logical size for crisp rendering at native resolution
+            SDL_RenderSetLogicalSize(RendererHandle, w, h);
 
             // Scaling workaround for OSX, SDL_WINDOW_ALLOW_HIGHDPI doesn't seem to work
             //if (OperatingSystem.IsMacOS())
