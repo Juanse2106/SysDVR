@@ -252,6 +252,21 @@ namespace SysDVR.Client.Targets.Player
             codectx->width = StreamInfo.VideoWidth;
             codectx->height = StreamInfo.VideoHeight;
 
+            // SwitchCast latency optimizations:
+            // Disable B-frames - Switch doesn't use them and waiting for them adds latency
+            codectx->has_b_frames = 0;
+            codectx->max_b_frames = 0;
+
+            // Low delay flag - tells decoder not to buffer frames waiting for reorder
+            codectx->flags |= AV_CODEC_FLAG_LOW_DELAY;
+
+            // Use multiple threads for faster decoding on multi-core TV box
+            codectx->thread_count = 2;
+            codectx->thread_type = FF_THREAD_SLICE;
+
+            // Skip loop filter for non-reference frames - faster decode, minimal quality loss
+            codectx->skip_loop_filter = AVDiscard.AVDISCARD_NONREF;
+
             var (ex, sz) = LibavUtils.AllocateH264Extradata();
             codectx->extradata_size = sz;
             codectx->extradata = (byte*)ex.ToPointer();
