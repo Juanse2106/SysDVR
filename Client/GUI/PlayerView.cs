@@ -1,4 +1,4 @@
-﻿using ImGuiNET;
+using ImGuiNET;
 using SysDVR.Client.App;
 using SysDVR.Client.Core;
 using SysDVR.Client.GUI.Components;
@@ -98,7 +98,26 @@ namespace SysDVR.Client.GUI
             var w = (int)Program.SdlCtx.WindowSize.X;
             var h = (int)Program.SdlCtx.WindowSize.Y;
 
-            if (w >= h * Ratio)
+            // SwitchCast quality: try integer scaling first (1x, 2x, 3x)
+            // Integer scaling is always sharper than fractional scaling
+            int intScale = 1;
+            while ((StreamInfo.VideoWidth * (intScale + 1)) <= w &&
+                   (StreamInfo.VideoHeight * (intScale + 1)) <= h)
+                intScale++;
+
+            int intW = StreamInfo.VideoWidth * intScale;
+            int intH = StreamInfo.VideoHeight * intScale;
+
+            // Only use integer scaling if it fills at least 80% of the screen
+            // Otherwise fall back to aspect-ratio fill for better use of screen space
+            bool useIntegerScale = (intW >= w * 0.8f) || (intH >= h * 0.8f);
+
+            if (useIntegerScale)
+            {
+                DisplayRect.w = intW;
+                DisplayRect.h = intH;
+            }
+            else if (w >= h * Ratio)
             {
                 DisplayRect.w = (int)(h * Ratio);
                 DisplayRect.h = h;
