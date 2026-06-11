@@ -26,7 +26,8 @@
 */
 #define MaxABatching 5
 
-#define DefaultABatching 3
+// SwitchCast: reduced from 3 to 1 for lower audio latency on USB
+#define DefaultABatching 1
 
 enum PacketMeta 
 {
