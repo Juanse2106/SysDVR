@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
     <!--
         SysDVR USB device filter
         The Switch running SysDVR presents itself as a Google ADB device:
         VID = 0x18D1 (Google) -> decimal 6353
         PID = 0x4EE0 (Nexus/Pixel ADB) -> decimal 20192
+
         This matches ALL Switch / Switch Lite / Switch OLED consoles with SysDVR.
         No per-console registration needed - every Switch uses these same IDs.
         Android will auto-launch SysDVR-Client when this device is plugged in.
