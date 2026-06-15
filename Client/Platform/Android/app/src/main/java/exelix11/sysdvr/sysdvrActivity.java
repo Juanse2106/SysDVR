@@ -111,3 +111,4 @@ public class sysdvrActivity extends SDLActivity
         Log.i("SysDVRJava", message);
     }
 }
+
