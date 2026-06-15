@@ -264,8 +264,9 @@ namespace SysDVR.Client.Targets.Player
             codectx->thread_count = 2;
             codectx->thread_type = FF_THREAD_SLICE;
 
-            // Skip loop filter for non-reference frames - faster decode, minimal quality loss
-            codectx->skip_loop_filter = AVDiscard.AVDISCARD_NONREF;
+            // SwitchCast: keep deblocking filter on ALL frames for better quality
+            // AVDISCARD_NONREF was here before but it disabled deblocking causing pixelation
+            codectx->skip_loop_filter = AVDiscard.AVDISCARD_NONE;
 
             var (ex, sz) = LibavUtils.AllocateH264Extradata();
             codectx->extradata_size = sz;
@@ -412,9 +413,14 @@ namespace SysDVR.Client.Targets.Player
 
             av_frame_get_buffer(dstframe, 32).AssertZero("Couldn't allocate the buffer for the converted frame");
 
+            // SwitchCast: upgraded from SWS_FAST_BILINEAR to SWS_LANCZOS
+            // Lanczos is the highest quality scaler - reduces compression artifacts and color fringing
+            // SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP = full chroma processing for better color accuracy
+            // SWS_ACCURATE_RND = more accurate rounding for better pixel precision
             swsContext = sws_getContext(codecctx->width, codecctx->height, codecctx->pix_fmt,
                                         dstframe->width, dstframe->height, (AVPixelFormat)dstframe->format,
-                                        SWS_FAST_BILINEAR, null, null, null);
+                                        SWS_LANCZOS | SWS_FULL_CHR_H_INT | SWS_FULL_CHR_H_INP | SWS_ACCURATE_RND,
+                                        null, null, null);
 
             if (swsContext == null)
                 throw new Exception("Couldn't initialize the converter");
